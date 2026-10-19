@@ -13,6 +13,8 @@ to a frozen model — not by sticking sticky notes on a brain, but by installing
 tiny, efficient mechanical system that flexes existing knowledge into new
 dimensions.
 
+![The Hoberman Lens — QLoRA as a folding toy](diagram.svg)
+
 ---
 
 ## Why the usual analogies fail
@@ -99,6 +101,54 @@ That's the superpower of parameter-efficient fine-tuning:
 
 ---
 
+## By the numbers — a worked example
+
+The metaphor is a picture; the math is the thing. Here is a concrete case so the
+numbers match the toy.
+
+Take one attention weight matrix in a Llama-sized model:
+
+```
+W ∈ ℝ^(4096 × 4096)      # the "rigid strut" — one layer's weight
+```
+
+**Full fine-tuning** touches all of it:
+
+```
+4096 × 4096 = 16,777,216 trainable parameters
+```
+
+**QLoRA with rank r = 8** instead freezes `W` and trains two skinny matrices:
+
+```
+A ∈ ℝ^(8 × 4096)   B ∈ ℝ^(4096 × 8)   # the "pivot joints"
+8×4096 + 4096×8 = 65,536 parameters
+```
+
+That is **0.39%** of the full matrix — the joints are a sliver of the frame.
+
+And on memory, the 4-bit quantization of the struts is what lets one GPU carry
+the whole sphere:
+
+```
+7B params @ 16-bit (bf16) → ~14 GB
+7B params @  4-bit (NF4)  → ~3.5 GB    ≈ 4× smaller
+```
+
+The forward pass ties it together:
+
+```
+y = W·x + (α/r)·B·A·x
+        └──── ΔW ────┘
+```
+
+`W·x` runs through the frozen 4-bit frame (dequantized on the fly for the
+computation). `B·A` is the low-rank detour — a tiny matrix built from the rank-8
+"waist" — and it is the *only* thing that gets updated. Swap `A` and `B`, and you
+swap behavior on the same loaded model.
+
+---
+
 ## Why this metaphor matters
 
 The AI community keeps struggling to teach the difference between **feeding text
@@ -117,11 +167,36 @@ loaded frame.
 
 ---
 
+## Where the metaphor breaks
+
+A good metaphor earns its keep by saying something true — and by knowing where
+it stops being true. This one has two fault lines. Flagging them keeps the
+picture honest instead of misleading.
+
+**1. The joints aren't *inside* the weights.** In the toy the pivot joints are
+woven into the sphere's structure. In a transformer the adapter is *additive and
+parallel* — `W' = W + (α/r)·B·A` runs as a side-channel *alongside* the frozen
+`W`, not a hinge embedded in the matrix. The sphere captures "a tiny part
+controls the whole shape"; it does not capture "the path is parallel, not
+structural". The diagram marks this: `B·A` branches off next to `W`, it isn't
+drawn inside it.
+
+**2. The struts aren't frozen during computation.** "Frozen 4-bit" is true for
+*training* — the gradients never reach `W`. But during the forward and backward
+passes the 4-bit weights are **dequantized on the fly** to 16-bit so the math can
+run. So the struts are frozen in *storage*, but live in *computation*. The toy's
+rigid rods are frozen all the time; QLoRA's are only frozen on disk.
+
+A metaphor that admits its own limits teaches more than one that overclaims.
+
+---
+
 ## Repo layout
 
 ```
 hoberman-lens/
-└── README.md   ← this file: the full metaphor
+├── README.md   ← the full metaphor, the worked example, and where it breaks
+└── diagram.svg ← the toy ↔ weight-matrix mapping (renders on GitHub)
 ```
 
 ## The one-line pitch

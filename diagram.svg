@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-rotate">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a5568"/>
+    </marker>
+    <style>
+      .title { font-size: 26px; font-weight: 700; fill: #1f2933; }
+      .sub   { font-size: 14px; fill: #52606d; }
+      .panel { font-size: 17px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+      .cap   { font-size: 12px; fill: #6b7280; }
+      .lbl   { font-size: 13px; fill: #1f2933; }
+      .small { font-size: 11px; fill: #6b7280; }
+      .frozen { fill: #dbeafe; stroke: #3b5dc1; stroke-width: 2; }
+      .train  { fill: #fde8e0; stroke: #d9539; stroke-width: 2; }
+      .train2 { fill: #fde8e0; stroke: #e07a5f; stroke-width: 2; }
+      .sum    { fill: #fff; stroke: #1f2933; stroke-width: 2; }
+      .strut  { stroke: #2a9d8f; stroke-width: 4; stroke-linecap: round; }
+      .joint  { fill: #196f6a; }
+      .rods   { stroke: #2a9d8f; stroke-width: 3; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="760" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="500" y="42" text-anchor="middle" class="title">The Hoberman Lens — QLoRA as a folding toy</text>
+  <text x="500" y="66" text-anchor="middle" class="sub">Pull a toy open, and you can watch exactly what a low-rank adapter does to a frozen weight matrix.</text>
+
+  <!-- ============ LEFT PANEL: THE TOY ============ -->
+  <text x="240" y="112" text-anchor="middle" class="panel">THE TOY</text>
+
+  <!-- Closed sphere -->
+  <circle cx="150" cy="250" r="42" fill="#e9f5f2" stroke="#2a9d8f" stroke-width="2"/>
+  <line x1="150" y1="214" x2="150" y2="286" class="rods"/>
+  <line x1="119" y1="232" x2="181" y2="268" class="rods"/>
+  <line x1="119" y1="268" x2="181" y2="232" class="rods"/>
+  <text x="150" y="322" text-anchor="middle" class="lbl">Closed — 9″ ball</text>
+  <text x="150" y="340" text-anchor="middle" class="small">the rigid frame you never touch</text>
+
+  <!-- Expand arrow -->
+  <line x1="205" y1="250" x2="288" y2="250" class="strut" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="246" y="240" text-anchor="middle" class="lbl">pull → expand</text>
+
+  <!-- Open sphere (faceted lattice) -->
+  <circle cx="420" cy="250" r="118" fill="#e9f5f2" stroke="#2a9d8f" stroke-width="2"/>
+  <circle cx="420" cy="250" r="44" fill="#f2faf8" stroke="#2a9d8f" stroke-width="1.5"/>
+  <!-- 6 radial struts: inner vertex -> outer vertex -->
+  <line x1="464" y1="250" x2="538" y2="250" class="strut"/>
+  <line x1="442" y1="288" x2="489" y2="350" class="strut"/>
+  <line x1="398" y1="288" x2="351" y2="350" class="strut"/>
+  <line x1="376" y1="250" x2="302" y2="250" class="strut"/>
+  <line x1="398" y1="212" x2="351" y2="150" class="strut"/>
+  <line x1="442" y1="212" x2="489" y2="150" class="strut"/>
+  <!-- joints at outer vertices -->
+  <circle cx="538" cy="250" r="6" class="joint"/>
+  <circle cx="489" cy="350" r="6" class="joint"/>
+  <circle cx="351" cy="350" r="6" class="joint"/>
+  <circle cx="302" cy="250" r="6" class="joint"/>
+  <circle cx="351" cy="150" r="6" class="joint"/>
+  <circle cx="489" cy="150" r="6" class="joint"/>
+  <!-- joints at inner vertices -->
+  <circle cx="464" cy="250" r="5" class="joint"/>
+  <circle cx="442" cy="288" r="5" class="joint"/>
+  <circle cx="398" cy="288" r="5" class="joint"/>
+  <circle cx="376" cy="250" r="5" class="joint"/>
+  <circle cx="398" cy="212" r="5" class="joint"/>
+  <circle cx="442" cy="212" r="5" class="joint"/>
+  <text x="420" y="400" text-anchor="middle" class="lbl">Open — 30″ lattice</text>
+  <text x="420" y="418" text-anchor="middle" class="small">same frame, big change via the joints</text>
+
+  <!-- ============ RIGHT PANEL: THE MODEL ============ -->
+  <text x="740" y="112" text-anchor="middle" class="panel">THE MODEL</text>
+
+  <!-- x input split -->
+  <text x="60" y="640" class="lbl" font-size="16" font-style="italic">x</text>
+  <line x1="92" y1="636" x2="618" y2="300" stroke="#4a5568" stroke-width="1.4" marker-end="url(#arrow)" opacity="0.35"/>
+  <line x1="92" y1="636" x2="618" y2="438" stroke="#4a5568" stroke-width="1.4" marker-end="url(#arrow)" opacity="0.35"/>
+
+  <!-- Frozen W branch -->
+  <rect x="620" y="262" width="150" height="76" rx="8" class="frozen"/>
+  <text x="695" y="292" text-anchor="middle" class="lbl" font-weight="700" font-size="16">W</text>
+  <text x="695" y="312" text-anchor="middle" class="small">base weights · 4-bit NF4</text>
+  <text x="695" y="327" text-anchor="middle" class="small">frozen during training</text>
+  <line x1="590" y1="300" x2="616" y2="300" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Trainable LoRA branch -->
+  <rect x="620" y="410" width="96" height="56" rx="8" class="train2"/>
+  <text x="668" y="434" text-anchor="middle" class="lbl" font-weight="700">A</text>
+  <text x="668" y="450" text-anchor="middle" class="small">(r × d)</text>
+
+  <rect x="726" y="420" width="34" height="36" rx="6" fill="#fff" stroke="#1f2933" stroke-width="1.5"/>
+  <text x="743" y="436" text-anchor="middle" class="lbl" font-size="12" font-style="italic">r</text>
+  <text x="743" y="476" text-anchor="middle" class="small">rank — the</text>
+  <text x="743" y="490" text-anchor="middle" class="small">low-rank waist</text>
+
+  <rect x="768" y="410" width="96" height="56" rx="8" class="train2"/>
+  <text x="816" y="434" text-anchor="middle" class="lbl" font-weight="700">B</text>
+  <text x="816" y="450" text-anchor="middle" class="small">(d × r)</text>
+
+  <line x1="718" y1="438" x2="724" y2="438" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="764" y1="438" x2="766" y2="438" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- scale + route into sum -->
+  <text x="892" y="442" text-anchor="middle" class="lbl" font-size="12">× α/r</text>
+  <line x1="866" y1="438" x2="888" y2="438" stroke="#4a5568" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <path d="M892,432 L892,358" fill="none" stroke="#4a5568" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Sum node -->
+  <circle cx="900" cy="300" r="20" class="sum"/>
+  <text x="900" y="306" text-anchor="middle" class="lbl" font-weight="700" font-size="18">+</text>
+  <line x1="772" y1="300" x2="878" y2="300" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="900" y1="262" x2="900" y2="242" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Output -->
+  <line x1="920" y1="300" x2="958" y2="300" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="972" y="305" class="lbl" font-size="16" font-style="italic">y</text>
+
+  <!-- Equation -->
+  <text x="500" y="560" text-anchor="middle" class="lbl" font-size="15" font-weight="700">y = W·x + (α/r)·B·A·x</text>
+  <text x="500" y="586" text-anchor="middle" class="lbl" font-size="14">The change is ΔW = (α/r)·B·A — a big matrix built from a tiny rank-r bottleneck.</text>
+
+  <!-- ============ MAPPING LEGEND ============ -->
+  <rect x="120" y="620" width="760" height="118" rx="10" fill="#fff" stroke="#cbd2d9" stroke-width="1.5"/>
+  <text x="140" y="646" class="lbl" font-weight="700" font-size="13">The mapping</text>
+  <line x1="470" y1="632" x2="470" y2="726" stroke="#cbd2d9" stroke-width="1.2"/>
+
+  <text x="140" y="672" class="lbl">Rigid struts</text>
+  <text x="140" y="690" class="small">frozen plastic frame</text>
+  <text x="500" y="672" class="lbl">→  W</text>
+  <text x="500" y="690" class="small">base weight matrix, 4-bit, frozen</text>
+
+  <text x="140" y="712" class="lbl">Pivot joints</text>
+  <text x="500" y="712" class="lbl">→  A, B</text>
+  <text x="500" y="726" class="small"></text>
+
+  <text x="540" y="672" class="lbl">Low-rank expansion</text>
+  <text x="540" y="690" class="small">joints × scale</text>
+  <text x="820" y="672" class="lbl">→  ΔW</text>
+  <text x="820" y="690" class="small">the behavioral change</text>
+  <text x="820" y="712" class="small">built cheaply via A·B</text>
+</svg>
