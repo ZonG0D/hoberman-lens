@@ -167,6 +167,46 @@ loaded frame.
 
 ---
 
+## Over-tuning — when the sphere stops flowing
+
+So far the metaphor has covered *training*: tightening the joints. But a Hoberman
+sphere only earns its keep when it *moves*. Inference is when you feel whether the
+tuning was right — and that's where over-training shows its face.
+
+**A well-tuned adapter flows.** The ΔW varies gently and continuously as the
+input changes, so the sphere opens and closes smoothly and the model generates
+coherently. The joints are tense enough to steer, loose enough to flex.
+
+**Over-training over-tensions the joints.** Push too hard — too many epochs, a
+rank that's too high, or an `α` that's too large relative to `r` — and the
+adapter's ΔW stops being a subtle modulation and starts *shoving* into the
+residual stream. The `α/r` scaling factor is the tension knob: at `α = r` the
+adapter injects at unit strength, at `α = 2r` at double. Push past what the frame
+can take and the sphere goes stiff. It "flattens" — its range of motion collapses,
+and it can no longer flex into new dimensions.
+
+That stiffness is the "stuttering" and "rolling bump" you feel at runtime. An
+over-trained adapter produces a *peaked, over-confident* probability distribution
+— it commits too hard to the patterns it memorized. When generation hits those
+over-trained tokens, the sphere snaps instead of gliding: the model gets stuck in
+repetition or loops, and the transitions jar.
+
+And the struts are still there. Catastrophic forgetting isn't the weights
+disappearing — the frozen 4-bit base still *has* the general capabilities. The
+over-tensioned adapter just *obscures* them: "it may still have the capability
+encoded in its weights but loses the ability to activate it consistently." The
+sphere is whole; it's just locked stiff.
+
+**The tension knobs** — how you bring the flow back:
+
+| Joint over-tuned | What it does to the sphere | Runtime symptom | The fix |
+| --- | --- | --- | --- |
+| Too many epochs | ΔW over-fixed, joints locked | Repetition, getting stuck | Early stopping + eval strategy |
+| `α` too high vs `r` | Adapter shoves into residual stream | Jarring, unstable output | `α ≈ 2r` heuristic |
+| Rank too high | Adapter overlaps old-task directions | Catastrophic forgetting | Keep rank modest |
+
+---
+
 ## Where the metaphor breaks
 
 A good metaphor earns its keep by saying something true — and by knowing where
