@@ -207,6 +207,26 @@ sphere is whole; it's just locked stiff.
 
 ---
 
+## The lens in the lab — a cross-lingual experiment
+
+The section above described what goes wrong when you over-tension the joints:
+stuttering, repetition, a sphere that locks stiff. The practical question is
+whether there's a gentler way to steer behavior. One experiment is testing
+exactly that — see the companion writeup,
+[Cross-Lingual QLoRA Fine-Tuning: Hindi → English](./cross-lingual-qlora.md).
+
+The idea: multilingual models share representations across languages, so
+fine-tuning on a small **Hindi** dataset might shape **English** behavior — and
+might do so with *less* of the parroting and stuttering that small-scale English
+fine-tuning tends to produce. That would be a way of keeping the sphere flowing
+without over-tensioning the joints. It's framed honestly as a hypothesis, to be
+proven or killed by controlled runs on consumer hardware (RTX 3060, ~300 rows,
+under 20 minutes). The methodology — controlling for base model, examples, rank,
+alpha, dropout, LR, batch, steps, and evaluation — is the point: a small,
+reproducible probe rather than a claim.
+
+---
+
 ## Where the metaphor breaks
 
 A good metaphor earns its keep by saying something true — and by knowing where
@@ -235,8 +255,9 @@ A metaphor that admits its own limits teaches more than one that overclaims.
 
 ```
 hoberman-lens/
-├── README.md   ← the full metaphor, the worked example, and where it breaks
-└── diagram.svg ← the toy ↔ weight-matrix mapping (renders on GitHub)
+├── README.md                  ← the metaphor: QLoRA as a folding toy
+├── diagram.svg                ← the toy ↔ weight-matrix mapping (animated)
+└── cross-lingual-qlora.md     ← the experiment: Hindi → English on consumer HW
 ```
 
 ## The one-line pitch
