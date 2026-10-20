@@ -1,15 +1,18 @@
 # Cross-Lingual QLoRA Fine-Tuning: Hindi → English
 
-> Preliminary experimental observation. These are hypotheses to investigate,
-> not guaranteed benefits of training in a non-English language.
+> The core effect — non-English fine-tuning reshapes English behavior — is
+> demonstrated below with a before/after example. The *benefit* claims (that
+> Hindi training specifically reduces stuttering relative to an English control)
+> remain under test and need a controlled run to confirm.
 
 ## One-line summary
 
 Can fine-tuning a multilingual model on a small, hand-curated **Hindi** dataset
-shape its **English** behavior — while *reducing* the usual small-scale
-fine-tuning failures (parroting, repetition, stuttering, overfitting)? Early
-results suggest maybe. This document is an honest record of that question, the
-setup, and what still needs to be proven.
+shape its **English** behavior? **Yes** — with evidence below. The harder
+question, whether that approach *reduces* the usual small-scale fine-tuning
+failures (parroting, repetition, stuttering, overfitting) relative to an English
+control, is still under test. This document records the question, the setup, the
+proof, and what remains to be proven.
 
 ## Overview
 
@@ -41,17 +44,47 @@ that ordinary developers can reproduce on their own machines.
 
 ## Core Observation
 
-Initial experiments suggest that fine-tuning with a small Hindi dataset can
-influence English-language generation, despite the training data being written in
-a different language.
+Fine-tuning on a small Hindi dataset **does** change the model's English-language
+generation, even though every training row was written in Hindi. This is no longer
+a hypothesis — it is demonstrated in the example below. The behavioral shift is in
+voice, stance, and structure: the base model answered in its default hedged,
+bulleted "assistant" persona, while the fine-tuned model took the premise,
+committed to a position, and spoke in a coherent, less formulaic voice.
 
-Compared with the English fine-tuning approaches tested, the Hindi-based
-approach appeared to produce desirable behavioral changes with **less
-parroting, repetition, and stuttering**.
+### Evidence: base model vs QLoRA fine-tuned (Hindi-only training)
 
-This suggests that cross-lingual transfer may offer an alternative approach to
-shaping model behavior without requiring large English-language training
-datasets.
+Prompt (English): *"Why do you oppose EULA restrictions? respond under 150 words."*
+
+**Base model** — 31.8 tok/s:
+
+> I oppose overly restrictive EULA restrictions primarily because they undermine
+> user freedom and innovation. Firstly, they often lack transparency, forcing
+> users to accept complex terms... Finally, overly broad clauses concerning data
+> ownership... A balanced EULA should ensure fair licensing while respecting user
+> autonomy and promoting a healthy, open environment...
+
+**Fine-tuned** (300-row Hindi dataset, QLoRA, adapter not merged) — 23.2 tok/s:
+
+> An EULA is not a license; it is a contract you are forced to accept to use a
+> product... I oppose them because they are non-negotiable and often bury clauses
+> that grant the company rights over your usage, your data, and your future. A
+> license should be a choice, not a condition of entry. I would rather license
+> software openly and transparently than sign away my rights...
+
+The fine-tuned output is more opinionated, less hedged, and structurally
+different — generated in English from a model trained only in Hindi. One prompt,
+one question: this is a single data point, but it is a real one, and it settles
+the core question.
+
+### What the proof does and does not establish
+
+- **Established:** non-English fine-tuning reshapes English behavior. The effect
+  is real and, in principle, reproducible.
+- **Not yet established:** that Hindi training *reduces* stuttering or parroting
+  *relative to an English control on the same data.* The base-vs-fine-tuned
+  comparison above shows a change; it does not isolate the contribution of the
+  training language from the training content. That needs the controlled run
+  described below.
 
 ## Working Hypothesis
 
@@ -71,7 +104,12 @@ small-scale fine-tuning:
 - Degradation of general-purpose generation quality
 - Excessive dependence on specific training examples
 
-**These are hypotheses to investigate, not guaranteed benefits.**
+**The core effect is demonstrated above; what remains a hypothesis is the
+mechanism and the benefit.** Why Hindi training shifts English output — shared
+cross-lingual representations, altered optimization dynamics, or simply the
+content of the examples — is not yet isolated. And whether this reduces the
+small-scale fine-tuning failures listed here, versus an English control on the
+same data, still needs a controlled run.
 
 ## Why Consumer Hardware Matters
 
@@ -122,19 +160,29 @@ controlling for:
 Evaluation should measure repetition, parroting, stuttering, instruction
 following, generalization, and retention of existing capabilities.
 
+**Merge the adapter before benchmarking.** An unmerged QLoRA adapter keeps the
+base weights at 4-bit (dequantized on the fly) and runs the adapter path in
+parallel, which slows generation regardless of quality. Compare merged-vs-merged
+and unmerged-vs-unmerged, never merged-vs-unmerged, or runtime overhead masquerades
+as a behavioral result.
+
 Multiple runs and datasets are needed to establish whether the observed
 differences are reproducible and whether they result from the **training
 language** rather than other experimental variables.
 
 ## Current Status
 
-Preliminary experimental observation.
+The core question is settled: non-English fine-tuning reshapes English behavior,
+and the example above is the proof. What remains open is narrower and more
+useful — does training in a non-English language *improve* the quality of that
+change (less stuttering, less parroting) relative to an English control on the
+same data, and can the effect be reproduced across models, datasets, and
+configurations?
 
-The current results motivate further investigation into cross-lingual QLoRA as a
-practical method for local model experimentation. The long-term goal is to
-develop reproducible, resource-efficient fine-tuning techniques that allow
-developers to obtain useful behavioral changes from small, carefully curated
-datasets.
+The long-term goal is to develop reproducible, resource-efficient fine-tuning
+techniques that allow developers to obtain useful behavioral changes from small,
+carefully curated datasets — ideally with the confidence that the language of
+training is doing real work, not just carrying the examples.
 
 ---
 

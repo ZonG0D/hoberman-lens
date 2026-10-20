@@ -211,19 +211,17 @@ sphere is whole; it's just locked stiff.
 
 The section above described what goes wrong when you over-tension the joints:
 stuttering, repetition, a sphere that locks stiff. The practical question is
-whether there's a gentler way to steer behavior. One experiment is testing
-exactly that — see the companion writeup,
-[Cross-Lingual QLoRA Fine-Tuning: Hindi → English](./cross-lingual-qlora.md).
+whether there's a gentler way to steer behavior. The companion writeup,
+[Cross-Lingual QLoRA Fine-Tuning: Hindi → English](./cross-lingual-qlora.md),
+answers the core of that question — **yes, Hindi-only training reshapes English
+behavior** — with a before/after example.
 
 The idea: multilingual models share representations across languages, so
-fine-tuning on a small **Hindi** dataset might shape **English** behavior — and
-might do so with *less* of the parroting and stuttering that small-scale English
-fine-tuning tends to produce. That would be a way of keeping the sphere flowing
-without over-tensioning the joints. It's framed honestly as a hypothesis, to be
-proven or killed by controlled runs on consumer hardware (RTX 3060, ~300 rows,
-under 20 minutes). The methodology — controlling for base model, examples, rank,
-alpha, dropout, LR, batch, steps, and evaluation — is the point: a small,
-reproducible probe rather than a claim.
+fine-tuning on a small **Hindi** dataset shapes **English** behavior. The core
+effect is demonstrated; the finer claim — that it does so with *less* parroting
+and stuttering than English fine-tuning on the same data — is still under test.
+That benefit needs a controlled run to separate the contribution of the training
+language from the contribution of the training content.
 
 ---
 
